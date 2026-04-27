@@ -6,35 +6,60 @@ from jobs import jobs
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-st.set_page_config(page_title="ResumeGlow ✨", page_icon="🌈", layout="wide")
+# ---------- PAGE CONFIG ----------
+st.set_page_config(page_title="ResumePro Elite 💎", page_icon="💎", layout="wide")
 
-# ---------- UI ----------
+# ---------- PREMIUM UI ----------
 st.markdown("""
 <style>
+
+/* 🌌 Animated Background */
 .stApp {
-    background: linear-gradient(135deg, #fbc2eb, #a6c1ee);
-    color: #1a1a1a;
+    background: linear-gradient(-45deg, #0d1117, #1e2a4a, #0d1117, #06080d);
+    background-size: 400% 400%;
+    animation: gradientShift 12s ease infinite;
+    color: #f0f6fc;
 }
-.card {
-    background: rgba(255,255,255,0.95);
-    border-radius: 20px;
-    padding: 25px;
-    margin-bottom: 20px;
+
+@keyframes gradientShift {
+    0% {background-position:0% 50%;}
+    50% {background-position:100% 50%;}
+    100% {background-position:0% 50%;}
 }
-.skill {
-    display:inline-block;
-    padding:6px 12px;
-    margin:5px;
-    border-radius:12px;
-    background:#eee;
+
+/* ✨ Glass Cards */
+.glass-card {
+    background: rgba(23, 28, 36, 0.5);
+    backdrop-filter: blur(20px);
+    border-radius: 25px;
+    padding: 30px;
+    border: 1px solid rgba(255,255,255,0.08);
 }
+
+/* 🌈 Gradient Text */
+.highlight {
+    background: linear-gradient(90deg, #4facfe, #00f2fe);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* 🚀 Buttons */
+.stButton>button {
+    background: linear-gradient(90deg, #4facfe, #00f2fe);
+    border-radius: 14px;
+    color: white;
+    font-weight: bold;
+}
+
+/* 🎯 Center */
 .center {
     text-align:center;
 }
+
 </style>
 """, unsafe_allow_html=True)
 
-# ---------- STATE ----------
+# ---------- SESSION ----------
 if "users" not in st.session_state:
     st.session_state.users = {"user1": {"pass": "123"}}
 
@@ -67,21 +92,22 @@ if st.session_state.page == "home":
 
     st.markdown("<div class='center'>", unsafe_allow_html=True)
 
-    st.markdown("<h1>🌈 ResumeGlow ✨</h1>", unsafe_allow_html=True)
-    st.write("Turn your resume into career magic 💼")
+    st.markdown("""
+    <h1 style='font-size:70px;'>Next-Gen <span class='highlight'>Career AI</span></h1>
+    <p style='font-size:22px;'>Upload your resume & unlock job opportunities 🚀</p>
+    """, unsafe_allow_html=True)
 
-    st.write("✨ Upload → Analyze → Get Jobs → Apply 🚀")
+    st.markdown("---")
 
     col1, col2, col3 = st.columns(3)
-
     with col1:
-        st.write("🧠 Smart Analysis")
+        st.write("🧠 AI Analysis")
     with col2:
-        st.write("💼 Job Matching")
+        st.write("💼 Smart Matching")
     with col3:
         st.write("🚀 Apply Instantly")
 
-    if st.button("Enter Portal"):
+    if st.button("🚀 ENTER PORTAL"):
         st.session_state.page = "auth"
         st.rerun()
 
@@ -90,7 +116,9 @@ if st.session_state.page == "home":
 # ---------- AUTH ----------
 elif st.session_state.page == "auth":
 
-    tab1, tab2 = st.tabs(["Login", "Signup"])
+    st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
+
+    tab1, tab2 = st.tabs(["🔐 Login", "📝 Signup"])
 
     with tab1:
         user = st.text_input("Username")
@@ -112,6 +140,12 @@ elif st.session_state.page == "auth":
             st.session_state.users[new_user] = {"pass": new_pass}
             st.success("Account created")
 
+    if st.button("⬅ Back"):
+        st.session_state.page = "home"
+        st.rerun()
+
+    st.markdown("</div>", unsafe_allow_html=True)
+
 # ---------- APP ----------
 elif st.session_state.page == "app":
 
@@ -120,37 +154,40 @@ elif st.session_state.page == "app":
         st.session_state.page = "home"
         st.rerun()
 
-    file = st.file_uploader("Upload Resume", type="pdf")
+    st.markdown("<h2>✨ Command Center</h2>", unsafe_allow_html=True)
+
+    file = st.file_uploader("📄 Upload Resume", type="pdf")
 
     if file:
-        with st.spinner("Analyzing..."):
-            time.sleep(1)
+        with st.spinner("🔮 Analyzing..."):
+            time.sleep(1.5)
             results, skills = process_resume(file)
 
-        col1, col2 = st.columns([2, 1])
+        col1, col2 = st.columns([2,1])
 
+        # JOBS
         with col1:
-            st.markdown("<div class='card'>", unsafe_allow_html=True)
-            st.write("### Job Matches")
+            st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
+            st.write("### 🎯 Job Matches")
 
             for r in results[:3]:
-                st.markdown(f"""
-                🌟 **{r['role']}** — {r['score']}%  
-                👉 [Apply Now]({r['link']})
-                """)
+                st.write(f"**{r['role']}**")
+                st.progress(r['score']/100)
+                st.markdown(f"👉 [Apply Now 🚀]({r['link']})")
 
             st.markdown("</div>", unsafe_allow_html=True)
 
+        # SKILLS
         with col2:
-            st.markdown("<div class='card'>", unsafe_allow_html=True)
-            st.write("### Skills")
+            st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
+            st.write("### 🧠 Skills Found")
 
             for s in skills:
-                st.markdown(f"<span class='skill'>{s}</span>", unsafe_allow_html=True)
+                st.markdown(f"- {s}")
 
             st.markdown("</div>", unsafe_allow_html=True)
 
         st.balloons()
 
     else:
-        st.info("Upload resume to start")
+        st.info("Upload resume to begin 🚀")
