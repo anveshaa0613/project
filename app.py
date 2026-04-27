@@ -6,57 +6,35 @@ from jobs import jobs
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-# ---------- PAGE CONFIG ----------
 st.set_page_config(page_title="ResumeGlow ✨", page_icon="🌈", layout="wide")
 
-# ---------- IMPROVED UI ----------
+# ---------- UI ----------
 st.markdown("""
 <style>
-
-/* 🌈 Soft aesthetic background */
 .stApp {
     background: linear-gradient(135deg, #fbc2eb, #a6c1ee);
     color: #1a1a1a;
 }
-
-/* 📦 Cards */
 .card {
     background: rgba(255,255,255,0.95);
     border-radius: 20px;
     padding: 25px;
     margin-bottom: 20px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
 }
-
-/* 💅 Buttons */
-.stButton>button {
-    background: linear-gradient(90deg,#ff6ec4,#7873f5);
-    color: white;
-    border-radius: 12px;
-    font-weight: bold;
-}
-
-/* 🏷️ Skills */
 .skill {
     display:inline-block;
     padding:6px 12px;
     margin:5px;
     border-radius:12px;
     background:#eee;
-    color:#333;
-    font-size:12px;
-    font-weight:bold;
 }
-
-/* 🎯 Center */
 .center {
-    text-align: center;
+    text-align:center;
 }
-
 </style>
 """, unsafe_allow_html=True)
 
-# ---------- DATABASE ----------
+# ---------- STATE ----------
 if "users" not in st.session_state:
     st.session_state.users = {"user1": {"pass": "123"}}
 
@@ -84,41 +62,26 @@ def process_resume(file):
 
     return sorted(results, key=lambda x: x["score"], reverse=True), skills
 
-# ---------- HOME PAGE ----------
+# ---------- HOME ----------
 if st.session_state.page == "home":
 
     st.markdown("<div class='center'>", unsafe_allow_html=True)
 
-    st.markdown("""
-    <h1 style='font-size:70px;'>🌈 ResumeGlow ✨</h1>
-    <p style='font-size:22px;'>
-    Turn your resume into <b>career magic</b> 💼💖
-    </p>
-    """, unsafe_allow_html=True)
+    st.markdown("<h1>🌈 ResumeGlow ✨</h1>", unsafe_allow_html=True)
+    st.write("Turn your resume into career magic 💼")
 
-    st.write("✨ Upload → Analyze → Get Jobs → Apply instantly 🚀")
-
-    st.markdown("---")
+    st.write("✨ Upload → Analyze → Get Jobs → Apply 🚀")
 
     col1, col2, col3 = st.columns(3)
 
     with col1:
-        st.markdown("### 🧠 Smart Analysis")
-        st.write("Extracts your skills automatically")
-
+        st.write("🧠 Smart Analysis")
     with col2:
-        st.markdown("### 💼 Job Matching")
-        st.write("Finds best jobs using AI")
-
+        st.write("💼 Job Matching")
     with col3:
-        st.markdown("### 🚀 Apply Instantly")
-        st.write("Direct links to job platforms")
+        st.write("🚀 Apply Instantly")
 
-    st.markdown("---")
-
-    st.info("💡 Tip: Use a resume with clear skills for better results!")
-
-    if st.button("✨ Enter Portal"):
+    if st.button("Enter Portal"):
         st.session_state.page = "auth"
         st.rerun()
 
@@ -127,13 +90,11 @@ if st.session_state.page == "home":
 # ---------- AUTH ----------
 elif st.session_state.page == "auth":
 
-    st.markdown("<div class='card'>", unsafe_allow_html=True)
-
-    tab1, tab2 = st.tabs(["🔐 Login", "📝 Signup"])
+    tab1, tab2 = st.tabs(["Login", "Signup"])
 
     with tab1:
-        user = st.text_input("👤 Username")
-        pwd = st.text_input("🔑 Password", type="password")
+        user = st.text_input("Username")
+        pwd = st.text_input("Password", type="password")
 
         if st.button("Login"):
             if user in st.session_state.users and st.session_state.users[user]["pass"] == pwd:
@@ -141,58 +102,48 @@ elif st.session_state.page == "auth":
                 st.session_state.page = "app"
                 st.rerun()
             else:
-                st.error("❌ Wrong details")
+                st.error("Wrong details")
 
     with tab2:
-        new_user = st.text_input("✨ New Username")
-        new_pass = st.text_input("🔐 New Password", type="password")
+        new_user = st.text_input("New Username")
+        new_pass = st.text_input("New Password", type="password")
 
         if st.button("Create Account"):
             st.session_state.users[new_user] = {"pass": new_pass}
-            st.success("🎉 Account created!")
+            st.success("Account created")
 
-    if st.button("⬅ Back"):
-        st.session_state.page = "home"
-        st.rerun()
-
-    st.markdown("</div>", unsafe_allow_html=True)
-
-# ---------- MAIN APP ----------
+# ---------- APP ----------
 elif st.session_state.page == "app":
 
     st.sidebar.write(f"👤 {st.session_state.user}")
-    if st.sidebar.button("🚪 Logout"):
+    if st.sidebar.button("Logout"):
         st.session_state.page = "home"
         st.rerun()
 
-    st.title("💼 Career Dashboard ✨")
-
-    file = st.file_uploader("📄 Upload your Resume", type="pdf")
+    file = st.file_uploader("Upload Resume", type="pdf")
 
     if file:
-        with st.spinner("🔮 Analyzing your resume..."):
+        with st.spinner("Analyzing..."):
             time.sleep(1)
             results, skills = process_resume(file)
 
         col1, col2 = st.columns([2, 1])
 
-        # JOB MATCHES
         with col1:
             st.markdown("<div class='card'>", unsafe_allow_html=True)
-            st.write("### 💼 Job Matches")
+            st.write("### Job Matches")
 
             for r in results[:3]:
                 st.markdown(f"""
-                🌟 **{r['role']}** — {r['score']}% match  
-                👉 [Apply Now 🚀]({r['link']})
+                🌟 **{r['role']}** — {r['score']}%  
+                👉 [Apply Now]({r['link']})
                 """)
 
             st.markdown("</div>", unsafe_allow_html=True)
 
-        # SKILLS
         with col2:
             st.markdown("<div class='card'>", unsafe_allow_html=True)
-            st.write("### 🧠 Your Skills")
+            st.write("### Skills")
 
             for s in skills:
                 st.markdown(f"<span class='skill'>{s}</span>", unsafe_allow_html=True)
@@ -202,4 +153,4 @@ elif st.session_state.page == "app":
         st.balloons()
 
     else:
-        st.info("✨ Upload a resume to start your glow-up")
+        st.info("Upload resume to start")
